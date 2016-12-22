@@ -1,0 +1,51 @@
+apply plugin: 'js'
+
+// Declare your sources
+javascript.source {
+    dev {
+        js {
+            srcDir 'src/main/webapp/js/src'
+            include "**/*.js"
+            exclude "*.min.js"
+        }
+    }
+}
+
+// Configure the built-in task
+combineJs {
+    encoding = "UTF-8"
+    source = javascript.source.dev.js.files
+    dest = file("${buildDir}/js/bundle.js")
+}
+
+minifyJs {
+    source = combineJs
+	dest = file("${buildDir}/js/bundle.min.js")
+    sourceMap = file("${buildDir}/js/bundle.sourcemap.json")
+    closure {
+        warningLevel = 'QUIET'
+    }
+}
+
+gzipJs {
+    source = file("${buildDir}/js/bundle.min.js")
+	dest = file("${buildDir}/js/bundle.min.js")
+}
+
+war.dependsOn{
+    minifyJs
+}
+
+war {
+      exclude ('**/js/src*')
+      exclude ('**/js/src/***')
+	  exclude ('**/pages/_includes/script_includes.jsp')
+	  from( "${buildDir}/js", {
+		  exclude 'bundle.js'
+          into 'js'
+      })
+	  from('build-support/', {
+           include 'script_includes.jsp'
+           into 'pages/_includes/'
+      })
+}

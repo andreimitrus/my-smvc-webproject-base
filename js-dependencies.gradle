@@ -1,0 +1,33 @@
+apply plugin: 'com.craigburke.client-dependencies'
+
+clientDependencies {
+    installDir = 'src/main/webapp/js/lib'
+    useGlobalCache = true
+    checkDownloads = true
+    threadPoolSize = 10
+    //fileExtensions = ['js', 'css', 'ts'] // <1>
+    //releaseFolders = ['release', 'dist', 'lib'] // <2>
+    //copyIncludes = ['**', '**/**.min.js'] // <3>
+    copyExcludes = ['**/*.txt', '**/*.md', '**/index.js'] // <4>
+    npm {
+        'jquery'('2.2.0', into: 'jquery')
+        'bootstrap'('3.3.7', into: 'bootstrap') {
+		exclude '**/*.map', '**/npm.js'
+	}
+        'backbone'('1.2.0', into: 'backbone', exclude: 'underscore')
+	'backbone.marionette'('2.2.0', into: 'backbone.marionette', exclude: ['underscore', 'backbone.babysitter']) {
+		include 'lib/**'
+		eachFile { it.path -= 'dist/' }
+	}
+	'backbone.wreqr'('1.3.6', into: 'backbone.wreqr', exclude: 'underscore') {
+		include 'lib/**'
+		eachFile { it.path -= 'dist/' }
+	}
+        'requirejs'('2.1.11', into: 'requirejs') {
+		include 'require.js'
+	}
+        'handlebars'('3.0.1', into: 'handlebars', exclude: ['uglify-js', 'source-map', 'optimist', 'async']) {
+		include 'handlebars.runtime.amd.min.js', 'handlebars.js', 'handlebars.runtime.js', 'handlebars.runtime.amd.js', 'handlebars.min.js'
+	}
+    }
+}
